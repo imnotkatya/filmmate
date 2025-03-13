@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import './BuyTickets.css';  // Подключаем стили
 
 function BuyTickets() {
   const navigate = useNavigate();
+  const { movieId } = useParams();  // Извлекаем movieId из URL
   const [movies, setMovies] = useState([]);
   const [theaters, setTheaters] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -26,10 +27,17 @@ function BuyTickets() {
         setSessions(data.sessions);
         setTheaters(data.theaters);
 
-        if (data.theaters.length > 0) {
-          const firstTheater = data.theaters[0].theater_id;
-          setSelectedTheater(firstTheater);
-          updateAvailableDates(firstTheater, data.sessions);
+        // Убедимся, что movieId в URL существует и что он есть в списке фильмов
+        if (data.movies.some(movie => movie.movie_id === parseInt(movieId))) {
+          const filteredSessions = data.sessions.filter(session => session.movie_id === parseInt(movieId));
+          setAvailableSessions(filteredSessions);
+
+          // Если сеансы есть, то выбираем первый
+          if (filteredSessions.length > 0) {
+            setSelectedSession(filteredSessions[0].session_id);
+            setSelectedDate(filteredSessions[0].session_date);
+            setSelectedTheater(filteredSessions[0].theater_id);
+          }
         }
       } catch (error) {
         console.error("Ошибка загрузки данных:", error.message);
@@ -37,18 +45,10 @@ function BuyTickets() {
     };
 
     fetchData();
-  }, []);
-
-  const updateAvailableDates = (theaterId, allSessions) => {
-    const dates = [...new Set(allSessions.filter(s => s.theater_id === theaterId).map(s => s.session_date))];
-    if (dates.length > 0) {
-      setSelectedDate(dates[0]);
-      updateAvailableSessions(theaterId, dates[0], allSessions);
-    }
-  };
+  }, [movieId]);
 
   const updateAvailableSessions = (theaterId, date, allSessions) => {
-    const filteredSessions = allSessions.filter(s => s.theater_id === theaterId && s.session_date === date);
+    const filteredSessions = allSessions.filter(s => s.theater_id === theaterId && s.session_date === date && s.movie_id === parseInt(movieId));
     setAvailableSessions(filteredSessions);
     if (filteredSessions.length > 0) {
       setSelectedSession(filteredSessions[0].session_id);
@@ -61,7 +61,7 @@ function BuyTickets() {
 
   const handleTheaterSelect = (theaterId) => {
     setSelectedTheater(theaterId);
-    updateAvailableDates(theaterId, sessions);
+    updateAvailableSessions(theaterId, selectedDate, sessions);
   };
 
   const handleDateSelect = (date) => {
@@ -157,7 +157,6 @@ function BuyTickets() {
       alert('Произошла ошибка. Попробуйте снова.');
     }
   };
-  
 
   const handleEmailConfirm = () => {
     if (!userEmail) {
@@ -180,27 +179,29 @@ function BuyTickets() {
       <h1 className="title">Купить билеты на фильм</h1>
 
       {/* Выбор кинотеатра */}
-      <div>
-        <h2 className="section-title">Выберите кинотеатр</h2>
-        <div className="button-group">
-          {theaters.map((theater) => (
-            <button
-              key={theater.theater_id}
-              onClick={() => handleTheaterSelect(theater.theater_id)}
-              className={`button ${selectedTheater === theater.theater_id ? 'selected' : ''}`}
-            >
-              {theater.name}
-            </button>
-          ))}
+      {theaters && (
+        <div>
+          <h2 className="section-title">Выберите кинотеатр</h2>
+          <div className="button-group">
+            {theaters.map((theater) => (
+              <button
+                key={theater.theater_id}
+                onClick={() => handleTheaterSelect(theater.theater_id)}
+                className={`button ${selectedTheater === theater.theater_id ? 'selected' : ''}`}
+              >
+                {theater.name}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Выбор даты */}
       {selectedTheater && (
         <div>
           <h2 className="section-title">Выберите дату</h2>
           <div className="button-group">
-            {[...new Set(sessions.filter(s => s.theater_id === selectedTheater).map(s => s.session_date))].map((date) => (
+            {[...new Set(sessions.filter(s => s.theater_id === selectedTheater && s.movie_id === parseInt(movieId)).map(s => s.session_date))].map((date) => (
               <button
                 key={date}
                 onClick={() => handleDateSelect(date)}
@@ -262,18 +263,18 @@ function BuyTickets() {
             className="input"
           />
           {!emailConfirmed && (
-            <button onClick={handleEmailConfirm} className="button">Подтвердить email</button>
+            <button onClick={handleEmailConfirm} className="button">
+              Подтвердить email
+            </button>
           )}
         </div>
       )}
 
-      {/* Кнопка купить билеты */}
-      {selectedSeats.length > 0 && (
-        <div className="buy-button">
-          <button onClick={handleBuyTickets} className="button" disabled={!emailConfirmed}>
-            Купить билеты
-          </button>
-        </div>
+      {/* Подтверждение и покупка */}
+      {emailConfirmed && (
+        <button onClick={handleBuyTickets} className="button">
+          Купить билеты
+        </button>
       )}
     </div>
   );
