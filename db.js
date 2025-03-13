@@ -34,14 +34,14 @@ const Theater = sequelize.define("Theater", {
 });
 
 const PurchasedTicket = sequelize.define("PurchasedTicket", {
-    purchased_ticket_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    ticket_id: { type: DataTypes.INTEGER, allowNull: false },
-    user_email: { type: DataTypes.INTEGER, allowNull: false },
-    purchase_time: { type: DataTypes.DATE, defaultValue: Sequelize.NOW },
-  }, {
-    tableName: "purchasedtickets",
-    timestamps: false,
-  });
+  purchased_ticket_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  ticket_id: { type: DataTypes.INTEGER, allowNull: false },
+  user_email: { type: DataTypes.STRING, allowNull: false },  // Изменено на STRING для email
+  purchase_time: { type: DataTypes.DATE, defaultValue: Sequelize.NOW },
+}, {
+  tableName: "purchasedtickets",
+  timestamps: false,
+});
 
 const Session = sequelize.define("Session", {
   session_id: { type: DataTypes.INTEGER, primaryKey: true },
@@ -92,8 +92,6 @@ const Ticket = sequelize.define("Ticket", {
   tableName: "tickets",
   timestamps: false,
 });
-
-// Модель PurchasedTicket (Купленные билеты)
 
 // Установка связей
 Movie.hasMany(Session, { foreignKey: "movie_id" });
@@ -207,7 +205,7 @@ app.post("/api/purchase", async (req, res) => {
     // Обновление статуса места на "недоступно"
     await Seat.update(
       { is_available: false },
-      { where: { session_id: session_id, seat_number: seat_number } }
+      { where: { session_id, seat_number } }
     );
 
     res.status(200).json({ message: "Билет успешно куплен", ticket });
@@ -233,5 +231,4 @@ app.post("/api/update-ticket-status", async (req, res) => {
   }
 });
 
-
-app.listen(port, () => console.log(`🚀 Сервер работает на http://localhost:${port}`)); 
+app.listen(port, () => console.log(`🚀 Сервер работает на http://localhost:${port}`));

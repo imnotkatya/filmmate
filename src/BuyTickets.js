@@ -17,6 +17,7 @@ function BuyTickets() {
   const [userEmail, setUserEmail] = useState("");  // Состояние для email
   const [userId, setUserId] = useState(null);  // Состояние для ID пользователя
   const [emailConfirmed, setEmailConfirmed] = useState(false);  // Состояние подтверждения email
+  const [totalPrice, setTotalPrice] = useState(0); // Для расчета общей стоимости
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,15 +94,19 @@ function BuyTickets() {
       console.error("Ошибка при получении мест:", error.message);
     }
   };
-
   const handleSeatClick = (seat) => {
     if (!seat.is_available) return;  // Prevent selecting unavailable seats
     const seatIndex = selectedSeats.findIndex(s => s.seat_id === seat.seat_id);
     if (seatIndex === -1) {
-      setSelectedSeats([...selectedSeats, seat]);
+      setSelectedSeats([...selectedSeats, seat]);  // Add seat if not already selected
     } else {
-      setSelectedSeats(selectedSeats.filter(s => s.seat_id !== seat.seat_id));
+      setSelectedSeats(selectedSeats.filter(s => s.seat_id !== seat.seat_id));  // Remove seat if already selected
     }
+  };
+
+  const updateTotalPrice = () => {
+    const pricePerTicket = 12;  // Замените на актуальную цену
+    setTotalPrice(selectedSeats.length * pricePerTicket);
   };
 
   const handleBuyTickets = async () => {
@@ -121,7 +126,7 @@ function BuyTickets() {
       seat_number: selectedSeats.map(seat => seat.seat_id),  // Передаем только seat_id
       user_id: userId || 1,  // Если пользователь не зарегистрирован, передаем 1
       purchase_time: new Date().toISOString(),  // Текущее время
-      price: 12,  // Например, цена сессии, замените на актуальную цену
+      price: totalPrice,  // Общая цена
       email: userEmail,  // Добавляем email
     };
   
@@ -248,6 +253,21 @@ function BuyTickets() {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Выбранные билеты */}
+      {selectedSeats.length > 0 && (
+        <div>
+          <h2 className="section-title">Выбранные билеты</h2>
+          <ul>
+            {selectedSeats.map((seat) => (
+              <li key={seat.seat_id}>
+                Место: {seat.seat_number}
+              </li>
+            ))}
+          </ul>
+          <p>Общая стоимость: {totalPrice} руб.</p>
         </div>
       )}
 
