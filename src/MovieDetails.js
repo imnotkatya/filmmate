@@ -87,6 +87,7 @@ function MovieDetails() {
 
   return (
     <div className="flex flex-col items-center p-6 space-y-6 font-sans">
+       <button onClick={() => navigate(`/`)}>back</button>
       <h1 className="text-4xl font-bold">{movie.title}</h1>
       <img 
         src={`${IMAGE_BASE_URL}${movie.poster_path}`} 
@@ -123,61 +124,7 @@ function MovieDetails() {
         <p className="mt-6 text-red-500 font-semibold">Собака плакает</p>
       )}
       
-      {allData && (
-        <div className="mt-12 w-full max-w-4xl">
-          <h2 className="text-2xl font-semibold text-center mb-6">Данные всех таблиц</h2>
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-xl font-semibold">Фильмы</h3>
-              <table className="min-w-full table-auto mt-4">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 border">ID</th>
-                    <th className="px-4 py-2 border">Название</th>
-                    <th className="px-4 py-2 border">Жанр</th>
-                    <th className="px-4 py-2 border">Рейтинг</th>
-                    <th className="px-4 py-2 border">Продолжительность</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allData.movies.map(movie => (
-                    <tr key={movie.movie_id}>
-                      <td className="px-4 py-2 border">{movie.movie_id}</td>
-                      <td className="px-4 py-2 border">{movie.title}</td>
-                      <td className="px-4 py-2 border">{movie.genre}</td>
-                      <td className="px-4 py-2 border">{movie.rating}</td>
-                      <td className="px-4 py-2 border">{movie.duration}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            
-            <div>
-              <h3 className="text-xl font-semibold">Театры</h3>
-              <table className="min-w-full table-auto mt-4">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 border">ID</th>
-                    <th className="px-4 py-2 border">Название</th>
-                    <th className="px-4 py-2 border">Локация</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allData.theaters.map(theater => (
-                    <tr key={theater.theater_id}>
-                      <td className="px-4 py-2 border">{theater.theater_id}</td>
-                      <td className="px-4 py-2 border">{theater.name}</td>
-                      <td className="px-4 py-2 border">{theater.location}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
+    
     </div>
   );
 }
