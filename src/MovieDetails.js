@@ -1,5 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import './MovieDetails.css';
+import left from './assets/arrow-left.svg';
+import right from './assets/arrow-right.svg';
 
 const API_KEY = "60e0c7335b9b55e2cead9ef258b571ae";
 const BASE_URL = "https://api.themoviedb.org/3";
@@ -11,12 +14,77 @@ function MovieDetails() {
   const [movie, setMovie] = useState(null);
   const [trailer, setTrailer] = useState(null);
   const [sessions, setSessions] = useState([]);
-  const [allData, setAllData] = useState(null);
   const [loadingMovie, setLoadingMovie] = useState(true);
-  const [loadingAllData, setLoadingAllData] = useState(true);
-  
+  const [admin, setAdmin] = useState(false);
+  const [watchUrl, setWatchUrl] = useState("");
+  const [newWatchUrl, setNewWatchUrl] = useState("");
   const trailerRef = useRef(null);
+  const actorsCarouselRef = useRef(null);
 
+  const handleSessions = async (movie) => {
+    const movieData = {
+      movie_id: movie.id,
+      title: movie.title,
+      genre: movie.genres?.map(g => g.id).join(", "), 
+      rating: movie.vote_average,
+      duration: movie.runtime || 0, 
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/api/add_movie", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(movieData),
+      });
+
+      navigate("/sessions", { state: { movieData } });
+      const data = await response.json();
+    } catch (error) {
+      console.error("Ошибка при добавлении фильма:", error);
+      alert("Ошибка при добавлении фильма: " + error.message);
+    }
+  };
+
+  // Запрашиваем ссылку из базы данных
+  const fetchWatchUrl = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/watch_url/${id}`);
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data?.url) {
+        setWatchUrl(data.url);
+      }
+    } catch (error) {
+      console.error("Ошибка при загрузке ссылки:", error);
+    }
+  };
+
+  const saveWatchUrl = async () => {
+    try {
+      console.log(`Сохраняем ссылку: ${newWatchUrl} для фильма с ID: ${id}`);
+  
+      const response = await fetch(`http://localhost:5000/api/watch_url/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: newWatchUrl }),
+      });
+  
+      if (response.ok) {
+        setWatchUrl(newWatchUrl);
+        setNewWatchUrl("");
+        alert("Ссылка успешно сохранена");
+      } else {
+        alert("Ошибка при сохранении ссылки");
+      }
+    } catch (error) {
+      console.error("Ошибка сохранения:", error);
+    }
+  };
+  
   useEffect(() => {
     async function fetchMovieDetails() {
       setLoadingMovie(true);
@@ -24,17 +92,23 @@ function MovieDetails() {
         const response = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=ru&append_to_response=videos,credits`);
         const data = await response.json();
         setMovie(data);
+
         const trailerData = data.videos?.results?.find(video => video.type === "Trailer" && video.site === "YouTube");
         setTrailer(trailerData);
 
         const responseSessions = await fetch(`http://localhost:5000/api/sessions/${id}`);
         const movieSessions = await responseSessions.json();
-
         if (Array.isArray(movieSessions)) {
           setSessions(movieSessions);
-        } else {
-          console.error("Ошибка: sessions не является массивом");
         }
+
+        const isAdminStored = localStorage.getItem("isAdmin");
+        if (isAdminStored === "true") {
+          setAdmin(true);
+        }
+
+        // Загружаем ссылку на фильм из базы данных
+        await fetchWatchUrl();
       } catch (error) {
         console.error("Ошибка загрузки:", error);
       } finally {
@@ -45,26 +119,6 @@ function MovieDetails() {
     fetchMovieDetails();
   }, [id]);
 
-  useEffect(() => {
-    async function fetchAllData() {
-      setLoadingAllData(true);
-      try {
-        const response = await fetch("http://localhost:5000/api/all-tables");
-        if (!response.ok) {
-          throw new Error("Ошибка загрузки данных: " + response.statusText);
-        }
-        const data = await response.json();
-        setAllData(data);
-      } catch (error) {
-        console.error("Ошибка парсинга данных:", error);
-      } finally {
-        setLoadingAllData(false);
-      }
-    }
-
-    fetchAllData();
-  }, []);
-
   const scrollToTrailer = () => {
     trailerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -73,10 +127,14 @@ function MovieDetails() {
     navigate(`/buy-tickets/${id}`);
   };
 
-  const isMovieInTheaters = () => {
-    return sessions.length > 0; // Проверка на наличие сеансов
+  const isMovieInTheaters = () => sessions.length > 0;
+
+  const scrollCarousel = (direction) => {
+    const container = actorsCarouselRef.current;
+    const scrollAmount = direction === "left" ? -300 : 300;
+    container.scrollBy({ left: scrollAmount, behavior: "smooth" });
   };
-  
+
   if (loadingMovie) {
     return <div className="text-center text-lg font-semibold">Загрузка фильма...</div>;
   }
@@ -86,45 +144,118 @@ function MovieDetails() {
   }
 
   return (
-    <div className="flex flex-col items-center p-6 space-y-6 font-sans">
-       <button onClick={() => navigate(`/`)}>back</button>
-      <h1 className="text-4xl font-bold">{movie.title}</h1>
-      <img 
-        src={`${IMAGE_BASE_URL}${movie.poster_path}`} 
-        alt={movie.title} 
-        className="w-80 rounded-xl shadow-lg" 
-      />
-      <p className="text-lg text-gray-700 max-w-2xl text-center">{movie.overview}</p>
-
-      {trailer && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold">Трейлер</h2>
-          <div ref={trailerRef}>
-            <iframe 
-              width="560" 
-              height="315" 
-              src={`https://www.youtube.com/embed/${trailer.key}`} 
-              title="YouTube video player" 
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-            ></iframe>
+    <div className="container">
+      <div className="det-movie-card">
+        <div className="det-movie-content">
+          <div className="det-movie-header">
+            <div className="det-movie-image">
+              <img src={`${IMAGE_BASE_URL}${movie.poster_path}`} alt={movie.title} />
+            </div>
+            <div className="det-movie-info">
+              <h1>{movie.title}</h1>
+              <p>{movie.genres?.map(g => g.name).join(", ")}</p>
+              <p>Рейтинг: {movie.vote_average}</p>
+              <p>Длительность: {movie.runtime} мин</p>
+              <p>{movie.release_date}</p>
+            </div>
           </div>
-        </div>
-      )}
 
-      {isMovieInTheaters() ? (
-        <button 
-          className="mt-6 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600"
-          onClick={handleBuyTickets}
-        >
-          Купить билеты
-        </button>
-      ) : (
-        <p className="mt-6 text-red-500 font-semibold">Собака плакает</p>
-      )}
-      
-    
+          <p className="det-text-lg det-font-semibold">{movie.overview}</p>
+
+          {movie.credits?.cast && (
+            <div className="det-actors">
+              <h3>Актёрский состав</h3>
+              <div className="det-actors-carousel" ref={actorsCarouselRef}>
+                <button className="carousel-button left" onClick={() => scrollCarousel("left")}>
+                  <img src={left} alt="Left" />
+                </button>
+                <div className="det-actors-list">
+                  {movie.credits.cast.slice(0, 10).map(actor => (
+                    <div className="det-actor" key={actor.id}>
+                      <img
+                        src={actor.profile_path
+                          ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
+                          : "https://via.placeholder.com/80x80?text=No+Photo"}
+                        alt={actor.name}
+                        className="det-actor-img"
+                      />
+                      <span className="det-actor-name">{actor.name}</span>
+                    </div>
+                  ))}
+                </div>
+                <button className="carousel-button right" onClick={() => scrollCarousel("right")}>
+                  <img src={right} alt="Right" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          <h2>Трейлер</h2>
+          {trailer && (
+            <div className="det-movie-trailer">
+              <div ref={trailerRef}>
+                <iframe 
+                  width="560" 
+                  height="315" 
+                  src={`https://www.youtube.com/embed/${trailer.key}`} 
+                  title="YouTube video player" 
+                  frameBorder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+          )}
+
+          {/* Кнопка "Смотреть онлайн" */}
+          {watchUrl && (
+            <a 
+              href={watchUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="det-watch-btn"
+            >
+              Смотреть онлайн
+            </a>
+          )}
+
+          {/* Админская форма добавления ссылки */}
+          {admin && (
+            <div className="det-admin-watch-url">
+              <input 
+                type="text" 
+                placeholder="Введите ссылку на онлайн-платформу" 
+                value={newWatchUrl}
+                onChange={(e) => setNewWatchUrl(e.target.value)}
+                className="det-url-input"
+              />
+              <button onClick={saveWatchUrl} className="det-save-url-btn">
+                Сохранить ссылку
+              </button>
+            </div>
+          )}
+
+          {isMovieInTheaters() && (
+            <button className="det-buy-tickets-btn" onClick={handleBuyTickets}>
+              Купить билеты
+            </button>
+          )}
+
+          {admin && (
+            <button onClick={() => handleSessions(movie)} className="det-admin-btn">
+              Управление сеансами
+            </button>
+          )}
+
+          {!isMovieInTheaters() && !admin && (
+            <p className="det-no-sessions">Сеансы не доступны</p>
+          )}
+
+          <button onClick={() => navigate(`/`)} className="det-back-btn">
+            Назад
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

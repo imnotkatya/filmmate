@@ -29,14 +29,7 @@ const ContextProvider = (props) => {
 
   const onSent = async () => {
     if (!input.trim()) return;
- if (!input.trim()) return;
 
-  if (!isMovieOrSeriesRelated(input)) {
-    setMessages(prev => [...prev, { sender: "user", text: input }]);
-    setMessages(prev => [...prev, { sender: "AI", text: "Извините, я могу отвечать только на вопросы, связанные с фильмами и сериалами." }]);
-    setInput("");
-    return;
-  }
     const newUserMessage = { sender: "user", text: input };
     const updatedMessages = [...messages, newUserMessage];
     setMessages(updatedMessages);
@@ -93,18 +86,7 @@ const ContextProvider = (props) => {
     messages,
     setMessages
   };
-  const isMovieOrSeriesRelated = (text) => {
-    const keywords = [
-      "фильм", "сериал", "кино", "режиссёр", "актер", "актриса", "жанр", 
-      "смотреть", "кинопоиск", "IMDB", "триллер", "комедия", "драма", 
-      "ужасы", "рейтинг", "премьера", "сезон", "серия", "эпизод", "платформа",
-      "Netflix", "HBO", "Amazon Prime", "Disney+", "мультфильм", "аниме"
-    ];
-  
-    const lowerText = text.toLowerCase();
-    return keywords.some(keyword => lowerText.includes(keyword));
-  };
-  
+
   return (
     <Context.Provider value={contextValue}>
       {props.children}

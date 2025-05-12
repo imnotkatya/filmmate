@@ -1,0 +1,337 @@
+
+.det-movie-card {
+
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 8px;
+    box-shadow: 0 12px 18px rgba(244, 242, 242, 0.1);
+  }
+  
+  .det-movie-content {
+    display: flex;
+    
+    flex-direction: column;
+  }
+  
+  .det-movie-header {
+
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .det-movie-image img {
+    width: 400px;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .det-movie-info {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    
+    justify-content: flex-start; /* внутри блока — тоже вверх */
+  }
+  
+  .det-movie-info h1 {
+    font-size: 64px;
+    font-weight: bold;
+  }
+  
+  .det-movie-info p {
+    font-size: 32px;
+    margin: 5px 0;
+  }
+  
+  .det-movie-details {
+    margin-top: 20px;
+  }
+  
+  .det-actor-list {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Отступы между карточками актеров */
+  }
+  
+  .det-actor-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100px; /* Фиксированная ширина для каждой карточки */
+  }
+  
+  .det-actor-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px; /* Отступ от имени актера */
+  }
+  
+  .det-actor-card p {
+    font-size: 14px;
+    text-align: center;
+    margin: 0;
+  }
+  
+  .det-admin-btn,
+  .det-buy-tickets-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    gap: 10px;
+    font-size: 26px;
+    margin-top: 20px;
+  }
+  
+  .det-admin-btn:hover,
+  .det-buy-tickets-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .det-no-sessions {
+    color: #777;
+    font-size: 16px;
+  }
+  .det-movie-trailer {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center; /* Выровняет трейлер по горизонтали */
+    align-items: center; /* Выровняет трейлер по вертикали */
+  }
+  
+  .det-movie-trailer h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .det-text-center {
+    text-align: center;
+  }
+  
+  .det-text-lg {
+    font-size: 18px;
+  }
+  
+  .det-font-semibold {
+    font-weight: 600;
+  }
+  
+  .det-actors {
+    margin-top: 30px;
+  }
+  
+  .det-actors h3 {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+  
+  .det-actors-list {
+    display: flex;
+    flex-wrap: wrap;
+   justify-content: center;
+    gap: 36px;
+  }
+  
+  .det-actor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+    text-align: center;
+    font-size: 12px;
+  }
+  
+  .det-actor-img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    margin-bottom: 6px;
+  }
+  
+  .det-actor-name {
+    font-size: 12px;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+  
+  .det-trailer-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 соотношение сторон */
+    height: 0;
+    overflow: hidden;
+    margin-top: 70px;
+  }
+  
+  .det-trailer-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 50%;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  
+  }
+  .det-actors-carousel {
+    display: flex;
+    overflow-x: hidden; /* Скрытие горизонтальной полосы прокрутки */
+    scroll-behavior: smooth;
+    gap: 15px;
+    position: relative;
+  }
+  
+  .det-actors-list {
+    display: flex;
+    flex-wrap: nowrap; /* Убираем перенос на следующую строку */
+    justify-content: center;
+    gap: 36px;
+  }
+  
+  
+  .det-actor {
+    flex: 0 0 auto;
+    width: 100px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .det-actor-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  
+  .carousel-button {
+    background: transparent;
+    border: none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1;
+  }
+  
+  .carousel-button.left {
+    left: 0;
+  }
+  
+  .carousel-button.right {
+    right: 0;
+  }
+  
+  .carousel-button img {
+    width: 30px;
+    height: 30px;
+  }
+  /* Стили для кнопки "Купить билеты" */
+.det-buy-tickets-btn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    text-transform: uppercase;
+  }
+  
+  .det-buy-tickets-btn:hover {
+    background: linear-gradient(135deg, #0056b3, #007bff);
+    transform: translateY(-3px); /* Легкий эффект подъема */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .det-buy-tickets-btn:active {
+    transform: translateY(0); /* При нажатии кнопка возвращается в исходное положение */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Стили для кнопки "Управление сеансами" */
+  .det-admin-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    text-transform: uppercase;
+  }
+  
+  .det-admin-btn:hover {
+    background-color: #218838;
+    transform: translateY(-3px); /* Легкий эффект подъема */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .det-admin-btn:active {
+    transform: translateY(0); /* При нажатии кнопка возвращается в исходное положение */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Стили для кнопки "Назад" */
+  .det-back-btn {
+    background-color: #6c757d;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    text-transform: uppercase;
+    margin-top: 20px;
+  }
+  
+  .det-back-btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-3px); /* Легкий эффект подъема */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .det-back-btn:active {
+    transform: translateY(0); /* При нажатии кнопка возвращается в исходное положение */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Стили для текста, если сеансы недоступны */
+  .det-no-sessions {
+    font-size: 18px;
+    color: #888;
+    margin-top: 20px;
+  }
+  p
+  {
+    text-align: left;
+  }

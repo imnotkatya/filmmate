@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import left from './assets/arrow-left.svg';
 
 function Auth() {
   const [email, setEmail] = useState("");
@@ -15,14 +16,14 @@ function Auth() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-  
+
     const userData = {
       email,
       password,
       nickname: isRegister ? nickname : undefined, // Только при регистрации передаем nickname
       role: "user",
     };
-  
+
     try {
       let response;
       if (isRegister) {
@@ -44,9 +45,9 @@ function Auth() {
           body: JSON.stringify(userData),
         });
       }
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         if (isRegister) {
           // Если регистрация успешна, переключаем на форму входа
@@ -73,16 +74,23 @@ function Auth() {
       setLoading(false); // Завершаем состояние загрузки
     }
   };
-  
-  return (
-    <div style={{ textAlign: "center", fontFamily: "Arial", marginTop: "50px" }}>
-      <h2>{isRegister ? "Регистрация" : "Вход"}</h2>
-      <button onClick={() => navigate("/")}>На главную</button>
 
-      <form onSubmit={handleSubmit} style={{ display: "inline-block", textAlign: "left" }}>
+  return (
+    <div style={containerStyle}>
+      {/* Стрелка слева */}
+      <img 
+        src={left} 
+        onClick={() => navigate("/")} 
+        style={backButtonStyle} 
+        alt="Back" 
+      />
+
+      <h2 style={headerStyle}>{isRegister ? "Регистрация" : "Вход"}</h2>
+
+      <form onSubmit={handleSubmit} style={formStyle}>
         {isRegister && !isRegistered && (
           <>
-            <label>Никнейм:</label>
+            <label style={labelStyle}>Никнейм:</label>
             <input 
               type="text" 
               value={nickname} 
@@ -93,7 +101,7 @@ function Auth() {
           </>
         )}
 
-        <label>Email:</label>
+        <label style={labelStyle}>Email:</label>
         <input 
           type="email" 
           value={email} 
@@ -102,7 +110,7 @@ function Auth() {
           style={inputStyle}
         />
 
-        <label>Пароль:</label>
+        <label style={labelStyle}>Пароль:</label>
         <input 
           type="password" 
           value={password} 
@@ -138,17 +146,50 @@ function Auth() {
   );
 }
 
+const containerStyle = {
+  textAlign: "center",
+  fontFamily: "Arial",
+  marginTop: "50px",
+  maxWidth: "500px",
+  margin: "0 auto"
+};
+
+const backButtonStyle = {
+  cursor: "pointer",
+  position: "absolute", // Добавлено для позиционирования
+  left: "20px", // Стрелка теперь будет с левой стороны
+  top: "20px", // Отступ сверху
+};
+
+const headerStyle = {
+  fontSize: "40px",
+  marginBottom: "20px"
+};
+
+const formStyle = {
+  display: "inline-block",
+  textAlign: "left",
+  width: "100%"
+};
+
+const labelStyle = {
+  fontSize: "18px",
+  display: "block",
+  marginBottom: "5px",
+};
+
 const inputStyle = {
   display: "block",
-  width: "250px",
-  padding: "8px",
+  width: "100%",
+  padding: "12px",
   margin: "10px 0",
   borderRadius: "5px",
-  border: "1px solid #ccc"
+  border: "1px solid #ccc",
+  fontSize: "16px",
 };
 
 const buttonStyle = {
-  padding: "10px 20px",
+  padding: "12px 20px",
   fontSize: "16px",
   cursor: "pointer",
   borderRadius: "5px",
@@ -156,7 +197,12 @@ const buttonStyle = {
   backgroundColor: "#28a745",
   color: "#fff",
   marginTop: "10px",
-  width: "100%"
+  width: "100%",
+  transition: "background-color 0.3s",
+};
+
+buttonStyle[":hover"] = {
+  backgroundColor: "#218838"
 };
 
 export default Auth;

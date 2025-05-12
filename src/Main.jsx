@@ -64,13 +64,7 @@ const Main = () => {
   return (
     <div className="main">
       <div className="main-container">
-      <div className="chat-history">
-  {messages.map((msg, index) => (
-    <div key={index} className={msg.sender === "user" ? "user-msg" : "ai-msg"}>
-      <p dangerouslySetInnerHTML={{ __html: msg.text }} />
-    </div>
-  ))}
-</div>
+  
 
         {showResult ? (
           <div className="result">
@@ -87,7 +81,8 @@ const Main = () => {
                 </div>
               ) : (
                 <>
-                  <img src={assets.gemini_icon} alt="Gemini Icon" />
+                  <img src={assets.gemini_icon} 
+                  alt="Gemini Icon" />
                   <p dangerouslySetInnerHTML={{ __html: linkedResultData }}></p>
                 </>
               )}
@@ -101,6 +96,7 @@ const Main = () => {
   type="text"
   onChange={(e) => setInput(e.target.value)}
   value={input}
+  style={{color:"black"}} 
   placeholder="Enter a prompt here"
   onKeyDown={(e) => {
     if (e.key === "Enter") {
@@ -110,7 +106,7 @@ const Main = () => {
 />
 
             <div>
-              <img onClick={onSent} src={assets.send_icon} alt="Send Icon" />
+              <img onClick={onSent} style={{backgroundColor:"whitesmoke"}} src={assets.send_icon} alt="Send Icon" />
             </div>
           </div>
           <p className="info">answer might not be accurate</p>

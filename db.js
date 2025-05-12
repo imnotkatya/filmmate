@@ -2,8 +2,10 @@ const express = require("express");
 const { Sequelize, DataTypes } = require("sequelize");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const { Pool } = require('pg');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
+
 const stripe = require("stripe")("sk_test_51RCNozFtMlrzCs5Y60kxjDHo5RCF8bh0yjVIyx347BnGQNEQOCpXnnM7euO78XvtxcRETgAgYkUcD0WERWO007cO00Iza3lZDG");
 
 const app = express();
@@ -16,6 +18,16 @@ const sequelize = new Sequelize("filmate", "postgres", "123", {
   host: "localhost",
   dialect: "postgres",
   port: 5433,
+});
+
+
+
+const pool = new Pool({
+  user: 'postgres',          // твой юзер
+  host: 'localhost',         // или адрес сервера
+  database: 'filmate', // имя базы
+  password: '123', // пароль
+  port: 5433,                // порт PostgreSQL
 });
 
 
@@ -46,6 +58,42 @@ app.post('/api/send-email', async (req, res) => {
     res.status(500).json({ message: "Ошибка при отправке письма" });
   }
 });
+app.delete("/api/theaters/delete_theater/:theater_id",async(req,res)=>
+{
+  const id = parseInt(req.params.theater_id);
+  try{
+    const deleteTheater=await Theater.destroy(
+      {
+        where:{theater_id:id},
+      }
+    )
+    res.status(200).json({ message: "Кинотеатр успешно удалён." });
+  }
+  catch(error)
+  {
+    console.error("Ошибка при удалении:", error);
+    res.status(500).json({ message: "Ошибка сервера при удалении кинотеатра." });
+  }
+})
+
+app.delete("/api/sessions/:session_id", async (req, res) => {
+  const id = parseInt(req.params.session_id);
+  try {
+    const deleted = await Session.destroy({
+      where: { session_id: id },
+    });
+
+    if (deleted) {
+      res.status(200).json({ message: "Сеанс успешно удалён." });
+    } else {
+      res.status(404).json({ message: "Сеанс не найден." });
+    }
+  } catch (error) {
+    console.error("Ошибка при удалении:", error);
+    res.status(500).json({ message: "Ошибка сервера при удалении сеанса." });
+  }
+});
+
 
 
 app.post("/api/create-payment-intent", async (req, res) => {
@@ -70,6 +118,25 @@ app.post("/api/create-payment-intent", async (req, res) => {
   }
 });
 
+
+const MovieLink = sequelize.define('MovieLink', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  movie_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  url: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  }
+}, {
+  tableName: "movie_links",
+  timestamps: false,
+});
 
 
 // Определение моделей
@@ -129,7 +196,7 @@ const PurchasedTicket = sequelize.define("PurchasedTicket", {
 });
 
 const Session = sequelize.define("Session", {
-  session_id: { type: DataTypes.INTEGER, primaryKey: true },
+  session_id: { type: DataTypes.INTEGER, primaryKey: true ,autoIncrement: true},
   movie_id: { type: DataTypes.INTEGER },
   theater_id: { type: DataTypes.INTEGER },
   session_date: { type: DataTypes.DATE },
@@ -176,28 +243,28 @@ const Ticket = sequelize.define("Ticket", {
   timestamps: false,
 });
 
+// Связи между Movie и MovieLink
+Movie.hasMany(MovieLink, { foreignKey: "movie_id" });
+MovieLink.belongsTo(Movie, { foreignKey: "movie_id" });
+
+// Связь между PurchasedTicket и User
+User.hasMany(PurchasedTicket, { foreignKey: "user_id" });
+PurchasedTicket.belongsTo(User, { foreignKey: "user_id" });
+
+// Связь между Playlist и User
+User.hasMany(Playlist, { foreignKey: "user_id" });
+Playlist.belongsTo(User, { foreignKey: "user_id" });
+
+// Связь между Playlist и Movie через Playlist_Movies
 Playlist.hasMany(Playlist_Movies, { foreignKey: "playlist_id" });
 Movie.hasMany(Playlist_Movies, { foreignKey: "movie_id" });
 
 Playlist_Movies.belongsTo(Playlist, { foreignKey: "playlist_id" });
 Playlist_Movies.belongsTo(Movie, { foreignKey: "movie_id" });
 
-
-// Установка связей
-Movie.hasMany(Session, { foreignKey: "movie_id" });
-Session.belongsTo(Movie, { foreignKey: "movie_id" });
-
-Theater.hasMany(Session, { foreignKey: "theater_id" });
-Session.belongsTo(Theater, { foreignKey: "theater_id" });
-
-Session.hasMany(Seat, { foreignKey: "session_id" });
-Seat.belongsTo(Session, { foreignKey: "session_id" });
-
-User.hasMany(Ticket, { foreignKey: "user_id" });
-Ticket.belongsTo(User, { foreignKey: "user_id" });
-
-Session.hasMany(Ticket, { foreignKey: "session_id" });
-Ticket.belongsTo(Session, { foreignKey: "session_id" });
+// Если предполагается, что покупка билетов также связана с PurchasedTicket
+Session.hasMany(PurchasedTicket, { foreignKey: "session_id" });
+PurchasedTicket.belongsTo(Session, { foreignKey: "session_id" });
 
 // Подключение к БД
 sequelize.authenticate()
@@ -298,24 +365,39 @@ app.get("/api/seats/:sessionId", async (req, res) => {
 
 // API: Купить билет
 app.post("/api/purchase", async (req, res) => {
-  const { session_id, seat_number, user_id, purchase_time, price, email } = req.body;
+  const { session_id, seat_numbers, user_id, purchase_time, price, email } = req.body;
+
+  if (!Array.isArray(seat_numbers) || seat_numbers.length === 0) {
+    return res.status(400).json({ message: "Нет выбранных мест." });
+  }
 
   try {
-    // Создание записи о покупке
-    const purchase = await Ticket.create({
-      session_id,
-      seat_number,
-      user_id,
-      purchase_time,
-      price,
-    });
-
-    // Создание записи о покупательном билете
-    await PurchasedTicket.create({
-      ticket_id: purchase.ticket_id,
-      user_email: email,
-      purchase_time,
-    });
+    for (const seat_number of seat_numbers) {
+      const purchase = await Ticket.create({
+        session_id,
+        seat_number,
+        user_id,
+        purchase_time,
+        price,
+      });
+      await Seat.update(
+        { is_available: false },
+        {
+          where: {
+            seat_id: seat_number,
+          },
+        }
+      );
+      await PurchasedTicket.create({
+        ticket_id: purchase.ticket_id,
+        user_email: email,
+        purchase_time,
+      });
+    
+      
+    
+    
+    }
 
     res.status(200).json({ message: "Покупка прошла успешно" });
   } catch (error) {
@@ -323,6 +405,7 @@ app.post("/api/purchase", async (req, res) => {
     res.status(400).json({ message: "Ошибка при оформлении покупки" });
   }
 });
+
 
 // Регистрация нового пользователя
 app.post("/api/update-ticket-status", async (req, res) => {
@@ -366,6 +449,58 @@ app.post("/api/playlists", async (req, res) => {
     res.status(500).json({ message: "Ошибка при создании плейлиста" });
   }
 });
+app.post("/api/add_movie", async (req, res) => {
+  const { movie_id, title, genre, rating, duration } = req.body;
+  try {
+    // Check if the movie already exists in the database
+    const result = await pool.query("SELECT * FROM movies WHERE movie_id = $1", [movie_id]);
+
+    if (result.rows.length > 0) {
+      // If the movie exists, return a 409 conflict status
+      return res.status(409).json({ message: "The movie already exists in the database." });
+    }
+
+    // If the movie doesn't exist, insert it into the database
+    await pool.query(
+      "INSERT INTO movies (movie_id, title, genre, rating, duration) VALUES ($1, $2, $3, $4, $5)",
+      [movie_id, title, genre, rating, duration]
+    );
+    res.status(201).json({ message: "The movie was successfully added." });
+  } catch (error) {
+    console.error("Error adding movie:", error);
+    res.status(500).json({ message: "Error adding movie." });
+  }
+});
+app.post("/api/add_session", async (req, res) => {
+  const { movie_id, theater_id, session_date, start_time, end_time, price } = req.body;
+
+  try {
+    // 1. Добавляем сеанс и получаем его ID
+    const sessionResult = await pool.query(
+      "INSERT INTO sessions (movie_id, theater_id, session_date, start_time, end_time, price) VALUES ($1, $2, $3, $4, $5, $6) RETURNING session_id",
+      [movie_id, theater_id, session_date, start_time, end_time, price]
+    );
+
+    const sessionId = sessionResult.rows[0].session_id;
+
+    // 2. Добавляем 5 свободных мест
+    const seatInserts = [];
+    for (let i = 1; i <= 5; i++) {
+      seatInserts.push(pool.query(
+        "INSERT INTO seats (session_id, seat_number, is_available) VALUES ($1, $2, $3)",
+        [sessionId, i, true]
+      ));
+    }
+
+    await Promise.all(seatInserts); // Ждем, пока все места добавятся
+
+    res.status(201).json({ message: "Сеанс и места успешно добавлены." });
+  } catch (error) {
+    console.error("Ошибка при добавлении сеанса:", error);
+    res.status(500).json({ message: "Ошибка при добавлении сеанса." });
+  }
+});
+
 
 app.post("/api/playlist_movies", async (req, res) => {
   const { playlist_id, movie_id,title,rating,duration,genre} = req.body;
@@ -465,7 +600,90 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ message: "Ошибка при входе" });
   }
 });
+app.get('/api/watch_url/:id', async (req, res) => {
+  const movieId = parseInt(req.params.id);  // Получаем ID фильма из URL
 
+  try {
+    // Получаем ссылку на фильм из таблицы movie_links
+    const result = await pool.query(
+      'SELECT url FROM movie_links WHERE movie_id = $1',
+      [movieId]
+    );
+
+    // Если ссылка найдена, отправляем ее в ответе
+    if (result.rows.length > 0) {
+      res.json({ url: result.rows[0].url });
+    } else {
+      // Если ссылка не найдена, отправляем 404 ошибку
+      res.status(404).json({ message: "Ссылка не найдена" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+app.post('/api/watch_url/:id', async (req, res) => {
+  const movieId = parseInt(req.params.id);  // Получаем ID фильма из URL
+  const { url } = req.body;  // Извлекаем новый URL из тела запроса
+
+  try {
+    // Вставляем новый URL в таблицу movie_links
+    const result = await pool.query(
+      'INSERT INTO movie_links (movie_id, url) VALUES ($1, $2) RETURNING *',
+      [movieId, url]
+    );
+
+    // Успешный ответ с добавленной ссылкой
+    res.json({ message: "Ссылка добавлена", movie_link: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+app.post('/api/movies', async (req, res) => {
+  const { movie_id, title, genre, rating, duration } = req.body;
+
+  try {
+    const existing = await pool.query('SELECT 1 FROM movies WHERE movie_id = $1', [movie_id]);
+
+    if (existing.rowCount === 0) {
+      await pool.query(
+        'INSERT INTO movies (movie_id, title, genre, rating, duration) VALUES ($1, $2, $3, $4, $5)',
+        [movie_id, title, genre, rating, duration]
+      );
+    }
+
+    res.status(200).send('OK');
+  } catch (error) {
+    console.error('Ошибка при добавлении фильма:', error);
+    res.status(500).send('Ошибка сервера');
+  }
+});
+
+
+
+app.put('/api/theaters/:theater_id', async (req, res) => {
+  const theaterId = parseInt(req.params.theater_id);
+  const { name, location } = req.body;
+
+  try {
+    const result = await pool.query(
+      'UPDATE theaters SET name = $1, location = $2 WHERE theater_id = $3 RETURNING *',
+      [name, location, theaterId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Кинотеатр не найден" });
+    }
+
+    res.json({ message: "Кинотеатр обновлён", theater: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
 
 
 
@@ -492,6 +710,25 @@ app.get('/api/profile/:userId', async (req, res) => {
     res.status(500).json({ message: 'Ошибка при получении профиля' });
   }
 });
+
+
+
+app.get('/api/sessions/:movie_id', async (req, res) => {
+  const movie_id = Number(req.params.movie_id);
+
+  try {
+    const sessions = await Session.findAll({
+      where: { movie_id }
+    });
+
+    res.json(sessions);
+  } catch (error) {
+    console.error('Ошибка при получении сеансов:', error);
+    res.status(500).json({ message: 'Ошибка при получении сеансов' });
+  }
+});
+
+
 
 
 // API: Получить фильмы из плейлиста по ID плейлиста

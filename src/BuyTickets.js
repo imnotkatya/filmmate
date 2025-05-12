@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Buying from './Buying'; // Импортируем компонент Buying
+import Buying from './Buying';
 import "./BuyTickets.css";
 
 function BuyTickets() {
@@ -12,16 +12,13 @@ function BuyTickets() {
   const [sessions, setSessions] = useState([]);
   const [selectedTheater, setSelectedTheater] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [availableSessions, setAvailableSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [availableSeats, setAvailableSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [userEmail, setUserEmail] = useState(localStorage.getItem("userEmail") || "");
   const [userId, setUserId] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [showPaymentForm, setShowPaymentForm] = useState(false); // Новое состояние для отображения формы оплаты
-  const { success } = location.state || {};
-  const { purchaseData } = location.state || {};
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   useEffect(() => {
     if (selectedSession) {
@@ -41,17 +38,13 @@ function BuyTickets() {
         setSessions(data.sessions);
         setTheaters(data.theaters);
 
-        if (data.movies.some(movie => movie.movie_id === parseInt(movieId))) {
-          const filteredSessions = data.sessions.filter(session => session.movie_id === parseInt(movieId));
-          setAvailableSessions(filteredSessions);
-
-          if (filteredSessions.length > 0) {
-            const firstSession = filteredSessions[0];
-            setSelectedSession(firstSession.session_id);
-            setSelectedDate(firstSession.session_date);
-            setSelectedTheater(firstSession.theater_id);
-            fetchSeats(firstSession.session_id);
-          }
+        const filteredSessions = data.sessions.filter(session => session.movie_id === parseInt(movieId));
+        if (filteredSessions.length > 0) {
+          const first = filteredSessions[0];
+          setSelectedSession(first.session_id);
+          setSelectedDate(first.session_date);
+          setSelectedTheater(first.theater_id);
+          fetchSeats(first.session_id);
         }
       } catch (error) {
         console.error("Ошибка загрузки данных:", error.message);
@@ -61,44 +54,29 @@ function BuyTickets() {
     fetchData();
   }, [movieId]);
 
-  const updateAvailableSessions = (theaterId, date) => {
-    const filteredSessions = sessions.filter(s => s.theater_id === theaterId && s.session_date === date && s.movie_id === parseInt(movieId));
-    const uniqueSessions = Array.from(new Set(filteredSessions.map(s => s.start_time)))
-      .map(time => filteredSessions.find(s => s.start_time === time));
-
-    const sessionsWithAvailableSeats = uniqueSessions.filter(session => {
-      return availableSeats.some(seat => seat.session_id === session.session_id && seat.is_available);
-    });
-
-    setAvailableSessions(sessionsWithAvailableSeats);
-    if (sessionsWithAvailableSeats.length > 0) {
-      setSelectedSession(sessionsWithAvailableSeats[0].session_id);
-      fetchSeats(sessionsWithAvailableSeats[0].session_id);
-    } else {
-      setSelectedSession(null);
-      setAvailableSeats([]);
-    }
-  };
-
   const handleBuyTickets = async () => {
     if (selectedSeats.length === 0) {
       alert('Пожалуйста, выберите хотя бы одно место!');
       return;
     }
 
-    // Проверяем, нужно ли запрашивать email для незарегистрированного пользователя
     if (!userId && !userEmail) {
       alert('Пожалуйста, введите вашу электронную почту!');
       return;
     }
 
+    const session = sessions.find(s => s.session_id === selectedSession);
+
     const purchaseData = {
       session_id: selectedSession,
-      seat_number: selectedSeats.map(seat => seat.seat_id)[0],  // Передаем только seat_id
-      user_id: userId || 1,  // Если пользователь не зарегистрирован, передаем 1
-      purchase_time: new Date().toISOString(),  // Текущее время
-      price: totalPrice,  // Общая цена
-      email: userEmail,  // Добавляем email
+      seat_numbers: selectedSeats.map(seat => seat.seat_id),
+      user_id: userId || 1,
+      purchase_time: new Date().toISOString(),
+      price: totalPrice,
+      email: userEmail,
+      movieId: movieId,
+      start: session?.start_time,
+      date: session?.session_date
     };
 
     navigate(`/buy-tickets/stripe/${movieId}`, { state: { purchaseData } });
@@ -106,29 +84,32 @@ function BuyTickets() {
 
   const handleTheaterSelect = (theaterId) => {
     setSelectedTheater(theaterId);
-    updateAvailableSessions(theaterId, selectedDate);
+    setSelectedDate(null);
+    setSelectedSession(null);
+    setAvailableSeats([]);
+    setSelectedSeats([]);
   };
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-    updateAvailableSessions(selectedTheater, date);
+    setSelectedSession(null);
+    setAvailableSeats([]);
+    setSelectedSeats([]);
   };
 
   const handleTimeSelect = (sessionId) => {
     setSelectedSession(sessionId);
-    if (sessionId) fetchSeats(sessionId);
+    fetchSeats(sessionId);
   };
 
   const fetchSeats = async (sessionId) => {
     try {
       const response = await fetch(`http://localhost:5000/api/seats/${sessionId}`);
       const data = await response.json();
-
       if (Array.isArray(data)) {
-        const filteredSeats = data.filter(seat => seat.session_id === sessionId);
-        setAvailableSeats(filteredSeats);
+        setAvailableSeats(data);
       } else {
-        console.error("Ошибка: данные не являются массивом.");
+        console.error("Ошибка: данные мест не являются массивом.");
       }
     } catch (error) {
       console.error("Ошибка при получении мест:", error.message);
@@ -137,14 +118,28 @@ function BuyTickets() {
 
   const handleSeatClick = (seat) => {
     if (!seat.is_available) return;
-
-    setSelectedSeats((prevSeats) => {
-      const seatIndex = prevSeats.findIndex(s => s.seat_id === seat.seat_id);
-      let newSeats = seatIndex === -1 ? [...prevSeats, seat] : prevSeats.filter(s => s.seat_id !== seat.seat_id);
-      return newSeats;
+    setSelectedSeats(prev => {
+      const exists = prev.find(s => s.seat_id === seat.seat_id);
+      return exists ? prev.filter(s => s.seat_id !== seat.seat_id) : [...prev, seat];
     });
   };
 
+  const getAvailableDates = () => {
+    return [...new Set(sessions
+      .filter(s => s.theater_id === selectedTheater && s.movie_id === parseInt(movieId))
+      .map(s => s.session_date))];
+  };
+
+  const getAvailableTimes = () => {
+    return [...new Map(
+      sessions
+        .filter(s =>
+          s.theater_id === selectedTheater &&
+          s.session_date === selectedDate &&
+          s.movie_id === parseInt(movieId))
+        .map(s => [s.start_time, s]) // уникальные по времени
+    ).values()];
+  };
 
   return (
     <div className="container">
@@ -154,8 +149,8 @@ function BuyTickets() {
       <h2 className="section-title">Выберите кинотеатр</h2>
       <div className="button-group">
         {theaters
-          .filter(theater => sessions.some(session => session.theater_id === theater.theater_id && session.movie_id === parseInt(movieId)))
-          .map((theater) => (
+          .filter(t => sessions.some(s => s.theater_id === t.theater_id && s.movie_id === parseInt(movieId)))
+          .map(theater => (
             <button
               key={theater.theater_id}
               className={`button ${selectedTheater === theater.theater_id ? "selected" : ""}`}
@@ -170,7 +165,7 @@ function BuyTickets() {
         <>
           <h2 className="section-title">Выберите дату</h2>
           <div className="button-group">
-            {[...new Set(sessions.filter(s => s.theater_id === selectedTheater && availableSessions.some(session => session.session_id === s.session_id)).map(s => s.session_date))].map(date => (
+            {getAvailableDates().map(date => (
               <button
                 key={date}
                 className={`button ${selectedDate === date ? "selected" : ""}`}
@@ -187,7 +182,7 @@ function BuyTickets() {
         <>
           <h2 className="section-title">Выберите время</h2>
           <div className="button-group">
-            {availableSessions.map(session => (
+            {getAvailableTimes().map(session => (
               <button
                 key={session.session_id}
                 className={`button ${selectedSession === session.session_id ? "selected" : ""}`}
@@ -205,14 +200,15 @@ function BuyTickets() {
           <h2 className="section-title">Выберите места</h2>
           <div className="seat-grid">
             {availableSeats.map(seat => (
-              <button
-                key={seat.seat_id}
-                className={`seat-button ${selectedSeats.some(s => s.seat_id === seat.seat_id) ? "selected" : ""}`}
-                disabled={!seat.is_available}
-                onClick={() => handleSeatClick(seat)}
-              >
-                {seat.seat_number}
-              </button>
+             <button
+             key={seat.seat_id}
+             className={`seat-button ${!seat.is_available ? "unavailable" : ""} ${selectedSeats.some(s => s.seat_id === seat.seat_id) ? "selected" : ""}`}
+             disabled={!seat.is_available}
+             onClick={() => handleSeatClick(seat)}
+           >
+             {seat.seat_number}
+           </button>
+           
             ))}
           </div>
         </>
@@ -221,14 +217,14 @@ function BuyTickets() {
       {selectedSeats.length > 0 && (
         <>
           <p>Общая стоимость: {totalPrice} руб.</p>
-          <button onClick={() => { handleBuyTickets(); }}>Купить билеты</button>
+          <div className="buy-button-container">
+  <button className="buy-button" onClick={handleBuyTickets}>Купить билеты</button>
+</div>
 
         </>
       )}
 
-      {showPaymentForm && (
-        <Buying />
-      )}
+      {showPaymentForm && <Buying />}
     </div>
   );
 }
