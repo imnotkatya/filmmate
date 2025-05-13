@@ -13,6 +13,7 @@ const BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
 function MovieList() {
+  const [linkedMovieIds, setLinkedMovieIds] = useState([]);
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,7 +26,7 @@ function MovieList() {
   const [playlists, setPlaylists] = useState([]);
   const [showPlaylists, setShowPlaylists] = useState(false);
   const isAdminStored = localStorage.getItem("isAdmin");
-
+  const [watchUrl, setWatchUrl] = useState("");
   const navigate = useNavigate();
 
   const isAuthenticated = !!localStorage.getItem("user");
@@ -42,6 +43,11 @@ function MovieList() {
       current.scrollLeft += scrollAmount;
     }
   };
+  useEffect(() => {
+    fetch('http://localhost:5000/api/watch_url_all')
+      .then((res) => res.json())
+      .then((data) => setLinkedMovieIds(data.movieIds));
+  }, []);
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % movies.length);
@@ -87,6 +93,19 @@ function MovieList() {
       }
     };
 
+    const fetchWatchUrl = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/watch_url_all`);
+        if (!response.ok) return;
+        const data = await response.json();
+       
+          setWatchUrl(data);
+          console.log(watchUrl);
+       
+      } catch (error) {
+        console.error("Ошибка при загрузке ссылки:", error);
+      }
+    };
     const fetchPlaylists = async () => {
       try {
         const response = await fetch(`http://localhost:5000/api/playlists/${userId}`);
@@ -104,6 +123,7 @@ function MovieList() {
     if (userId) {
       fetchProfile();
       fetchPlaylists();
+      fetchWatchUrl();
     }
   }, [userId]);
 
@@ -353,7 +373,7 @@ function MovieList() {
       <br />
       <a href="#fav" style={{ textDecoration: "none" }}>ЛЮБИМЫЕ ФИЛЬМЫ</a>
       <br />
-      <a href="#high" style={{ textDecoration: "none" }}>ВЫСОКИЙ РЕЙТИНГ</a>
+      <a href="#high" style={{ textDecoration: "none" }}>ПОСМОТРЕТЬ ОНЛАЙН</a>
     </div>
 
     <div style={{ display: "flex", justifyContent: "center" }}>
@@ -511,7 +531,7 @@ function MovieList() {
       </div>
       <div>
       <h2 id="high"
-      >ВЫСОКИЙ РЕЙТИНГ</h2>
+      >ПОСМОТРЕТЬ ОНЛАЙН</h2>
 
       <div style={{ position: "relative", width: "100%" }}>
         <img
@@ -541,8 +561,8 @@ function MovieList() {
           }}
         >
           {movies
-            .filter((movie) => movie.vote_average > 7.5) // если нужно условие по рейтингу
-            .map((movie) => (
+  .filter((movie) => linkedMovieIds.includes(movie.id))
+  .map((movie) => (
               <div key={movie.id} style={{ width  : "300px", flex: "0 0 auto" }}>
                 <img
                  onClick={() => handleMovieClick(movie.id)}

@@ -622,6 +622,20 @@ app.get('/api/watch_url/:id', async (req, res) => {
     res.status(500).json({ message: "Ошибка сервера" });
   }
 });
+app.get('/api/watch_url_all', async (req, res) => {
+  try {
+    // Получаем все movie_id из таблицы movie_links
+    const result = await pool.query('SELECT movie_id FROM movie_links');
+
+    // Возвращаем только массив ID фильмов
+    const movieIds = result.rows.map(row => row.movie_id);
+
+    res.json({ movieIds }); // Удобный JSON: { movieIds: [1, 2, 3, ...] }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
 
 app.post('/api/watch_url/:id', async (req, res) => {
   const movieId = parseInt(req.params.id);  // Получаем ID фильма из URL
