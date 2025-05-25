@@ -1,0 +1,153 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: #fff;
+  background-color: #1A192B;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #ccc;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.button {
+  padding: 0.75rem 1.25rem;
+  background-color: #292845;
+  color: #eee;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.button:hover {
+  background-color: #3a3860;
+  transform: translateY(-2px);
+}
+
+.button.selected {
+  background-color: #5C4DFF;
+  color: #fff;
+  font-weight: bold;
+}
+
+.seat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 8px;
+  margin: 2rem 0;
+  justify-items: center;
+}
+
+.seat-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.seat-button {
+  width: 40px;
+  height: 40px;
+  background-color: #2D2C3D;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.seat-button:hover {
+  background-color: #3c3a53;
+}
+
+.seat-button.selected {
+  background-color: #5C4DFF;
+  border-color: #766aff;
+  font-weight: bold;
+}
+
+.seat-button.unavailable {
+  background-color: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.empty-seat {
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+}
+
+p {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  /* text-align: center; */
+}
+
+button {
+  outline: none;
+}
+
+button:focus {
+  outline: 2px solid #5C4DFF;
+  outline-offset: 2px;
+}
+.seat-button {
+  padding: 10px;
+  margin: 5px;
+  background-color: #eeeeeeb4;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.seat-button.selected {
+  background-color: #4caf50; /* зеленый для выбранных */
+  color: white;
+}
+
+.seat-button.unavailable {
+  background-color: #f44336; /* красный для недоступных */
+  color: white;
+  cursor: not-allowed;
+}
+.buy-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.buy-button {
+  background-color: #ff5722;
+  color: white;
+  font-size: 18px;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.buy-button:hover {
+  background-color: #e64a19;
+  transform: scale(1.05);
+}

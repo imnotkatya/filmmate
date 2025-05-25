@@ -1,0 +1,128 @@
+.profile-page {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .user-info {
+    background-color: rgba(249, 249, 249, 0.2); /* 0.8 — это 80% непрозрачности */
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+  .user-info p {
+    background-color: rgba(249, 249, 249, 0.2); /* 0.8 — это 80% непрозрачности */
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  .user-info span {
+    background-color: rgba(249, 249, 249, 0);;/* 0.8 — это 80% непрозрачности */
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  
+  .user-info p {
+    margin: 10px 0;
+  }
+  
+  .user-info span {
+    font-weight: bold;
+  }
+  
+  .profile-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .profile-actions button {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .admin-button {
+    margin-bottom: 20px;
+  }
+  
+  .admin-panel {
+    margin-bottom: 30px;
+  }
+  
+  .playlist-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .playlist-item {
+    margin-bottom: 40px;
+  }
+  
+  .delete-button {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .carousel-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    scroll-behavior: smooth;
+    padding: 10px;
+  }
+  
+  .movie-card {
+    width: 200px;
+    flex: 0 0 auto;
+    text-align: center;
+  }
+  
+  .movie-poster {
+    width: 100%;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  
+  .movie-title {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  
+  .scroll-button {
+    position: absolute;
+    top: 40%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  .scroll-button.left {
+    left: 0;
+  }
+  
+  .scroll-button.right {
+    right: 0;
+  }
+  
+  button
+  {
+    padding: 10px 16px;
+    border-radius: 22px;
+  }
