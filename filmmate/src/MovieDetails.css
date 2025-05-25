@@ -1,0 +1,279 @@
+.det-movie-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+  border-radius: 8px;
+  box-shadow: 0 12px 18px rgba(244, 242, 242, 0.1);
+}
+
+.name {
+  color: #ff6bd6;
+}
+
+.res {
+  font-size: 20px;
+}
+
+.det-movie-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.det-movie-header {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.det-movie-image img {
+  width: 400px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.det-movie-info {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.det-movie-info h1 {
+  font-size: 64px;
+  font-weight: bold;
+}
+
+.det-movie-info p {
+  font-size: 32px;
+  margin: 5px 0;
+}
+
+.det-movie-details,
+.det-actors {
+  margin-top: 20px;
+}
+
+.det-actors {
+  margin-top: 30px;
+}
+
+.det-actors h3 {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+}
+
+.det-actors-list,
+.det-actors-carousel {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 36px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 10px 0;
+}
+
+.det-actor {
+  flex: 0 0 auto;
+  min-width: 100px;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.det-actor-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  margin-bottom: 10px;
+}
+
+.det-actor-name {
+  font-size: 12px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.det-text-center {
+  text-align: center;
+}
+
+.det-text-lg {
+  font-size: 18px;
+}
+
+.det-movie-trailer {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.det-movie-trailer h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.det-trailer-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  margin-top: 70px;
+}
+
+.det-trailer-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 50%;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.carousel-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.carousel-button img {
+  width: 30px;
+  height: 30px;
+}
+
+.carousel-button.left {
+  left: -20px;
+}
+
+.carousel-button.right {
+  right: -20px;
+}
+
+.det-admin-btn,
+.det-buy-tickets-btn,
+.det-back-btn {
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  transition: background-color 0.3s, transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  text-transform: uppercase;
+  margin-top: 20px;
+}
+
+.det-buy-tickets-btn {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.det-buy-tickets-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #007bff);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.det-buy-tickets-btn:active,
+.det-admin-btn:active,
+.det-back-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.det-admin-btn {
+  background-color: #28a745;
+}
+
+.det-admin-btn:hover {
+  background-color: #218838;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.det-back-btn {
+  background-color: #6c757d;
+}
+
+.det-back-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.det-no-sessions {
+  font-size: 18px;
+  color: #888;
+  margin-top: 20px;
+}
+
+p {
+  text-align: left;
+}
+.det-admin-watch-url
+{
+  display: flex;
+  gap: 20px;
+}
+.det-url-input
+{
+
+  max-width: 585px;
+}
+.det-admin-watch-url {
+  display: flex;
+  align-items: center; /* Вертикальное выравнивание */
+  gap: 27px; /* Расстояние между полем и кнопкой */
+  margin-top: 20px;
+}
+
+.det-url-input {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  flex: 1; /* Чтобы растягивалось по доступному пространству */
+}
+
+.det-save-url-btn {
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  height: 44px;
+  padding: 0 20px;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.det-save-url-btn:hover {
+  background-color: #0056b3;
+}
