@@ -2,6 +2,7 @@ body {
   
     color: #e0e0e0;
     font-family: "Segoe UI", sans-serif;
+    font-size: 24px;
   }
   
   /* Таблица */
@@ -70,9 +71,12 @@ body {
     display: flex;
     flex-direction: column;
     color: #ccc;
-    font-size: 0.95rem;
+    font-size: 2rem;
   }
-  
+  input
+  {
+    font-size: 18px;
+  }
   .input-group input[type="text"],
   .input-group input[type="number"],
   .input-group input[type="date"],
@@ -111,4 +115,19 @@ body {
   {
     color: #ff6bd6;
     font-size: 34px;
+        font-weight: 700;
+  }
+   body.light-theme .text-lg
+  {
+    color: #5C4DFF;
+    font-size: 34px;
+    font-weight: 700;
+  }
+
+  body.light-theme 
+  .input-group label {
+    display: flex;
+    flex-direction: column;
+    color: #1e1e1e;
+    font-size: 2rem;
   }

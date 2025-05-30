@@ -3,7 +3,24 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-  
+ body.light-theme .profile-page {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+body.light-theme .movie-title {
+  font-size: 24px;
+  /* тёмно-серый для контраста */
+  line-height: 1.2;
+  font-weight: 700; /* если нужен жирный */
+  margin-bottom: 10px;
+}
+ .empty-playlist-message {
+  font-size: 34px;
+  /* тёмно-серый для контраста */
+  line-height: 1.2;
+  /* если нужен жирный */
+  margin-bottom: 10px;
+}
+
   .user-info {
     background-color: rgba(249, 249, 249, 0.2); /* 0.8 — это 80% непрозрачности */
     padding: 20px;
@@ -16,6 +33,7 @@
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 20px;
+    font-size: 24px;
   }
   .user-info span {
     background-color: rgba(249, 249, 249, 0);;/* 0.8 — это 80% непрозрачности */
@@ -125,4 +143,10 @@
   {
     padding: 10px 16px;
     border-radius: 22px;
+  }
+  h3{
+    font-size: 34px;
+  }
+  h2{
+    text-align: center;
   }

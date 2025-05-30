@@ -39,7 +39,7 @@
 }
 
 .det-movie-info h1 {
-  font-size: 64px;
+  font-size: 45px;
   font-weight: bold;
 }
 
@@ -222,6 +222,25 @@
   transform: translateY(-3px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
+body.light-theme .name {
+
+  color: #1A192B; /* для контраста — можно изменить */
+}
+body.light-theme h1 {
+
+  color: #1A192B; /* для контраста — можно изменить */
+}
+body.light-theme .det-movie-image img  {
+
+  padding-top: 20px; /* для контраста — можно изменить */
+}
+body.light-theme .det-admin-watch-url .det-url-input {
+  color: #1A192B; /* цвет текста для светлой темы */
+  background-color: #fff; /* например, белый фон */
+  border: 1px solid #999;
+}
+
+
 
 .det-no-sessions {
   font-size: 18px;
@@ -276,4 +295,22 @@ p {
 
 .det-save-url-btn:hover {
   background-color: #0056b3;
+}
+
+
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Светлая тема */
+body.light-theme, html.light-theme {
+  background-color: #9591ff;
+}
+
+/* Тёмная тема */
+body.dark-theme, html.dark-theme {
+  background-color: #1A192B;
 }

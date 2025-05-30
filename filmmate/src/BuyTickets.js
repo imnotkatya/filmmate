@@ -194,25 +194,28 @@ function BuyTickets() {
           </div>
         </>
       )}
+{selectedSession && availableSeats.length > 0 && (
+  <>
+    <h2 className="section-title">Выберите места</h2>
+    {availableSeats.every(seat => !seat.is_available) ? (
+      <p className="no-seats-message">Все места уже заняты</p>
+    ) : (
+      <div className="seat-grid">
+        {availableSeats.map(seat => (
+          <button
+            key={seat.seat_id}
+            className={`seat-button ${!seat.is_available ? "unavailable" : ""} ${selectedSeats.some(s => s.seat_id === seat.seat_id) ? "selected" : ""}`}
+            disabled={!seat.is_available}
+            onClick={() => handleSeatClick(seat)}
+          >
+            {seat.seat_number}
+          </button>
+        ))}
+      </div>
+    )}
+  </>
+)}
 
-      {selectedSession && availableSeats.length > 0 && (
-        <>
-          <h2 className="section-title">Выберите места</h2>
-          <div className="seat-grid">
-            {availableSeats.map(seat => (
-             <button
-             key={seat.seat_id}
-             className={`seat-button ${!seat.is_available ? "unavailable" : ""} ${selectedSeats.some(s => s.seat_id === seat.seat_id) ? "selected" : ""}`}
-             disabled={!seat.is_available}
-             onClick={() => handleSeatClick(seat)}
-           >
-             {seat.seat_number}
-           </button>
-           
-            ))}
-          </div>
-        </>
-      )}
 
       {selectedSeats.length > 0 && (
         <>

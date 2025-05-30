@@ -65,7 +65,7 @@ console.log(purchaseData);
               body: JSON.stringify({
                 email: purchaseData.email,
                 subject: "Подтверждение покупки билета",
-                text: `Спасибо за покупку!\n\nВы приобрели билет(ы) на фильм "${movieDetails.title}" (${movieDetails.release_date}).\nОписание: ${movieDetails.overview}\n\nДата: ${purchaseData.date}\nВремя: ${purchaseData.start}\nМеста: ${purchaseData.seat_numbers}\nОбщая сумма: ${purchaseData.price} руб.`,
+                text: `Спасибо за покупку!\n\nВы приобрели билет(ы) на фильм "${movieDetails.title}" \nОписание: ${movieDetails.overview}\n\nДата: ${purchaseData.date}\nВремя: ${purchaseData.start}\nМеста: ${purchaseData.seat_numbers}\nОбщая сумма: ${purchaseData.price} руб.`,
               }),
             });
 
@@ -92,7 +92,8 @@ console.log(purchaseData);
 
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.cardElementContainer}>
-          <CardElement style={styles.cardElementStyle} />
+        <CardElement options={cardStyleOptions} />
+
         </div>
         <button
           type="submit"
@@ -110,6 +111,20 @@ console.log(purchaseData);
     </div>
   );
 }
+const cardStyleOptions = {
+  style: {
+    base: {
+      color: "#ffffff", // белый цвет текста
+      fontSize: "16px",
+      "::placeholder": {
+        color: "#cccccc", // светло-серый плейсхолдер
+      },
+    },
+    invalid: {
+      color: "#ff6b6b", // красный для некорректных данных
+    },
+  },
+};
 
 const styles = {
   container: {

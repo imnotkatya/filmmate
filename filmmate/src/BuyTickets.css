@@ -4,9 +4,19 @@
   padding: 2rem;
   color: #fff;
   background-color: #1A192B;
+  border-radius: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+body.light-theme .container
+{
+  background-color: #9591ff;
+  border: 15px solid  #1A192B;;
+}
 
+body.light-theme 
+{
+  background-color: #9591ff;;
+}
 .title {
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
@@ -26,6 +36,21 @@
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1rem;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Светлая тема */
+body.light-theme, html.light-theme {
+  background-color: #9591ff;
+}
+
+/* Тёмная тема */
+body.dark-theme, html.dark-theme {
+  background-color: #1A192B;
 }
 
 .button {
@@ -98,7 +123,7 @@
 }
 
 p {
-  font-size: 1.2rem;
+
   margin-top: 1rem;
   /* text-align: center; */
 }
@@ -150,4 +175,21 @@ button:focus {
 .buy-button:hover {
   background-color: #e64a19;
   transform: scale(1.05);
+}
+
+.no-seats-message {
+  color: rgb(220, 101, 101);
+  font-weight: bold;
+  margin: 10px 0;
+  text-align: center;
+  font-size: 26px;
+}
+ body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body.light-theme, html.light-theme {
+  background-color: #9591ff;
 }

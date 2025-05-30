@@ -69,7 +69,7 @@ const Main = () => {
         {showResult ? (
           <div className="result">
             <div className="result-title">
-              <img src={assets.user_icon} alt="User Icon" />
+              {/* <img src={assets.user_icon} alt="User Icon" /> */}
               <p>{recentPrompt}</p>
             </div>
             <div className="result-data">
@@ -109,7 +109,7 @@ const Main = () => {
               <img onClick={onSent} style={{backgroundColor:"whitesmoke"}} src={assets.send_icon} alt="Send Icon" />
             </div>
           </div>
-          <p className="info">answer might not be accurate</p>
+          <p className="info">ответы могут быть не точны</p>
         </div>
       </div>
     </div>

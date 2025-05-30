@@ -190,7 +190,7 @@ function Profile() {
         [playlistId]: prev[playlistId].filter((movie) => movie.movie_id !== movieId),
       }));
 
-      alert("Фильм удален!");
+   
     } catch (error) {
       console.error("Ошибка удаления фильма:", error);
       alert("Ошибка удаления фильма");

@@ -62,13 +62,24 @@ function MovieDetails() {
   };
 
   const saveWatchUrl = async () => {
+    if (!newWatchUrl.trim()) {
+      alert("Ссылка не может быть пустой");
+      return;
+    }
+  
+    const isValidUrl = /^https?:\/\/.+/.test(newWatchUrl);
+    if (!isValidUrl) {
+      alert("Введите корректную ссылку, начинающуюся с http:// или https://");
+      return;
+    }
+  
     try {
       const response = await fetch(`http://localhost:5000/api/watch_url/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: newWatchUrl }),
       });
-
+  
       if (response.ok) {
         setWatchUrl(newWatchUrl);
         setNewWatchUrl("");
@@ -78,9 +89,10 @@ function MovieDetails() {
       }
     } catch (error) {
       console.error("Ошибка сохранения:", error);
+      alert("Ошибка соединения с сервером");
     }
   };
-
+  
   useEffect(() => {
     async function fetchMovieDetails() {
       setLoadingMovie(true);
@@ -154,9 +166,9 @@ function MovieDetails() {
             <div className="det-actors">
               <h3>Актёрский состав</h3>
               <div className="det-carousel-wrapper">
-                <button className="carousel-button left" onClick={() => scrollCarousel("left")}>
+                {/* <button className="carousel-button left" onClick={() => scrollCarousel("left")}>
                   <img src={left} alt="Left" />
-                </button>
+                </button> */}
                 <div className="det-actors-carousel" ref={actorsCarouselRef}>
                   {movie.credits.cast.slice(0, 10).map(actor => (
                     <div className="det-actor" key={actor.id}>
@@ -171,9 +183,9 @@ function MovieDetails() {
                     </div>
                   ))}
                 </div>
-                <button className="carousel-button right" onClick={() => scrollCarousel("right")}>
+                {/* <button className="carousel-button right" onClick={() => scrollCarousel("right")}>
                   <img src={right} alt="Right" />
-                </button>
+                </button> */}
               </div>
             </div>
           )}
@@ -198,10 +210,17 @@ function MovieDetails() {
 
           {/* Ссылка на просмотр */}
           {watchUrl && (
-            <a href={watchUrl} target="_blank" rel="noopener noreferrer" className="det-watch-btn">
-              Смотреть онлайн
-            </a>
-          )}
+  <a
+    href={watchUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="det-watch-btn"
+    style={{ fontSize: "30px" ,textDecoration:"none"}} // или любой другой размер
+  >
+    Смотреть онлайн
+  </a>
+)}
+
 
           {/* Админская форма */}
           {admin && (

@@ -1,10 +1,14 @@
 /* Theater.css - Dark Theme */
 
+body.light-theme 
+{
+  background-color: #9591ff;;
+}
 body {
   font-family: 'Arial', sans-serif;
 
-  margin: 0;
-  padding: 20px;
+
+  padding: 60px;
   color: #e0e0e0;
   line-height: 1.6;
 }
@@ -72,7 +76,7 @@ tr:hover {
   margin-bottom: 20px;
 }
 
-input {
+.crud input {
   padding: 12px 15px;
   width: 100%;
   max-width: 400px;
@@ -83,6 +87,39 @@ input {
   transition: all 0.3s ease;
   background-color: #2d2d2d;
   color: #e0e0e0;
+}
+.crud input {
+  padding: 12px 15px;
+  width: 100%;
+  max-width: 400px;
+  margin: 8px 0;
+  border: 2px solid #3d3d3d;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+body.light-theme .one   {
+ border: 5px solid #ff6bd6;
+ padding: 0 20px 20px 20px;
+ border-radius: 15px;
+
+}
+body.light-theme .one h2  {
+
+ text-align: left;
+}
+
+body.light-theme .two   {
+ border: 5px solid #ff6bd6;
+ padding: 0 20px 20px 20px;
+ border-radius: 15px;
+
+}
+body.light-theme .two h2  {
+
+ text-align: left;
 }
 
 input:focus {
@@ -165,4 +202,19 @@ button:disabled {
   justify-content: center;
   gap: 500px;
   
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Светлая тема */
+body.light-theme, html.light-theme {
+  background-color: #9591ff;
+}
+
+/* Тёмная тема */
+body.dark-theme, html.dark-theme {
+  background-color: #1A192B;
 }

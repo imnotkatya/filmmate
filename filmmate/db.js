@@ -325,6 +325,28 @@ app.delete("/api/playlists_del/:playlistId", async (req, res) => {
     res.status(500).json({ message: "Ошибка сервера при удалении плейлиста" });
   }
 });
+
+app.delete("/api/playlist_movie_del/:playlistId/:movieId", async (req, res) => {
+  const { playlistId, movieId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `DELETE FROM playlist_movies WHERE playlist_id = $1 AND movie_id = $2`,
+      [playlistId, movieId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Фильм не найден в плейлисте." });
+    }
+
+    res.status(200).json({ message: "Фильм успешно удалён из плейлиста." });
+  } catch (error) {
+    console.error("Ошибка при удалении фильма:", error);
+    res.status(500).json({ message: "Ошибка сервера при удалении фильма." });
+  }
+});
+
+
 // API: Получить сеансы по фильму
 app.get("/api/sessions/:movieId", async (req, res) => {
   const movieId = Number(req.params.movieId);

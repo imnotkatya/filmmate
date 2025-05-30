@@ -18,16 +18,17 @@ function SearchBar({ searchQuery, setSearchQuery, minRating, setMinRating, sortB
           }
         }}
         style={{
-          backgroundColor: "white",
-          border: "none",
+          padding: "12px 15px",
+          width: "100%",
+          maxWidth: "700px",
+          margin: "8px 0",
+          border: "2px solid #3d3d3d",
           borderRadius: "8px",
-          color: "black",
-          marginTop: "10px",
-          padding: "10px 14px",
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-          outline: "none",
-          fontSize: "14px",
-          width: "100%"
+          fontSize: "16px",
+          transition: "all 0.3s ease",
+          backgroundColor: "white",
+  color:"black"
+
         }}
       />
     </div>
